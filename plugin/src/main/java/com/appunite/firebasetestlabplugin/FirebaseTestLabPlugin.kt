@@ -15,7 +15,6 @@ import com.appunite.firebasetestlabplugin.cloud.ProcessData
 import com.appunite.firebasetestlabplugin.cloud.TestType
 import com.appunite.firebasetestlabplugin.model.Device
 import com.appunite.firebasetestlabplugin.model.TestResults
-import com.appunite.firebasetestlabplugin.tasks.InstrumentationShardingTask
 import com.appunite.firebasetestlabplugin.utils.Constants
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
