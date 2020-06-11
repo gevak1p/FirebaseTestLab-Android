@@ -58,7 +58,7 @@ object FirebaseTestLabProcessCreator {
         return ProcessBuilder(
             sequenceOf(
                 processData.sdk.gcloud.absolutePath,
-                "firebase", "beta", "test", "android", "run",
+                "beta", "firebase", "test", "android", "run",
                 "--format=json",
                 "--device-ids=${device.deviceIds.joinArgs()}",
                 "--app=${processData.apk}",
