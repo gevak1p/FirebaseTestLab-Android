@@ -498,7 +498,7 @@ private fun resolveApk(variant: ApkVariant, baseVariantOutput: BaseVariantOutput
             } else {
                 it.apkNames.toList()[0]
             }
-            File(it.outputDirectory.get().asFile, filename)
+            File(it.outputDirectory.absoluteFile, filename)
         }
     } catch (e: Exception) {
         when (e) {
