@@ -330,61 +330,27 @@ class FirebaseTestLabPlugin : Plugin<Project> {
                     gCloudDirectory = cloudDirectoryName,
                     device = test.device,
                     apk = apkUnderTest,
-                    testType = TestType.Instrumentation(testApk)
+                    testType = TestType.Instrumentation(testApk),
+                    numShards = numShards
                 )
 
-                if (numShards > 0) {
-                    project.tasks.create(taskName, InstrumentationShardingTask::class.java) {
-                        group = Constants.FIREBASE_TEST_LAB
-                        description = "Run Instrumentation test for ${test.device.name} device on $variantName/${test.apk.name} in Firebase Test Lab"
-                        this.processData = processData
-                        this.stateFile = testResultFile
-
-                        if (downloader != null) {
-                            mustRunAfter(cleanTask)
-                        }
-                        dependsOn(taskSetup)
-                        dependsOn(arrayOf(resolveAssemble(extension.testVariant), resolveTestAssemble(extension.testVariant)))
-                        
-                        doFirst {
-                            testResultFile.writeText("")
-                        }
-
-                        doLast {
-                            val testResults = testResultFile.readText()
-
-                            logger.lifecycle("TESTS RESULTS: Every digit represents single shard.")
-                            logger.lifecycle("\"0\" means -> tests for particular shard passed.")
-                            logger.lifecycle("\"1\" means -> tests for particular shard failed.")
-
-                            logger.lifecycle("RESULTS_CODE: $testResults")
-                            logger.lifecycle("When result code is equal to 0 means that all tests for all shards passed, otherwise some of them failed.")
-    
-    
-                            processResult(testResults, ignoreFailures)
-                            
-                        }
+                project.task(taskName, closureOf<Task> {
+                    inputs.files(testApk, apkUnderTest)
+                    group = Constants.FIREBASE_TEST_LAB
+                    description = "Run Instrumentation test for ${test.device.name} device on $variantName/${test.apk.name} in Firebase Test Lab"
+                    if (downloader != null) {
+                        mustRunAfter(cleanTask)
                     }
-
-                } else {
-                    project.task(taskName, closureOf<Task> {
-                        inputs.files(testApk, apkUnderTest)
-                        group = Constants.FIREBASE_TEST_LAB
-                        description = "Run Instrumentation test for ${test.device.name} device on $variantName/${test.apk.name} in Firebase Test Lab"
-                        if (downloader != null) {
-                            mustRunAfter(cleanTask)
-                        }
-                        dependsOn(taskSetup)
-                        dependsOn(arrayOf(resolveAssemble(extension.testVariant), resolveTestAssemble(extension.testVariant)))
-                        doLast {
-                            logger.log(LogLevel.INFO, "Run instrumentation tests for ${this.name}")
-                            logger.log(LogLevel.DEBUG, "ProcessData for test: $processData")
-                            val result = FirebaseTestLabProcessCreator.callFirebaseTestLab(processData)
-                            logger.log(LogLevel.INFO, "Result of ${this.name}: $result")
-                            processResult(result, ignoreFailures)
-                        }
-                    })
-                }
+                    dependsOn(taskSetup)
+                    dependsOn(arrayOf(resolveAssemble(extension.testVariant), resolveTestAssemble(extension.testVariant)))
+                    doLast {
+                        logger.log(LogLevel.INFO, "Run instrumentation tests for ${this.name}")
+                        logger.log(LogLevel.DEBUG, "ProcessData for test: $processData")
+                        val result = FirebaseTestLabProcessCreator.callFirebaseTestLab(processData)
+                        logger.log(LogLevel.INFO, "Result of ${this.name}: $result")
+                        processResult(result, ignoreFailures)
+                    }
+                })
             }
 
         val allInstrumentation: Task = project.task(runTestsTaskInstrumentation, closureOf<Task> {

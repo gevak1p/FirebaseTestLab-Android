@@ -19,7 +19,8 @@ data class ProcessData(
     val device: Device,
     val apk: File,
     val testType: TestType,
-    val shardIndex: Int = -1
+    val shardIndex: Int = -1,
+    val numShards: Int = 0
 ) : Serializable
 
 object FirebaseTestLabProcessCreator {
@@ -57,10 +58,11 @@ object FirebaseTestLabProcessCreator {
         return ProcessBuilder(
             sequenceOf(
                 processData.sdk.gcloud.absolutePath,
-                "firebase", "test", "android", "run",
+                "firebase", "beta", "test", "android", "run",
                 "--format=json",
                 "--device-ids=${device.deviceIds.joinArgs()}",
                 "--app=${processData.apk}",
+                "--num-shards=${processData.numShards}",
                 "--locales=${device.locales.joinArgs()}",
                 "--os-version-ids=${device.androidApiLevels.joinArgs()}",
                 "--orientations=${device.screenOrientations.map { orientation -> orientation.gcloudName }.joinArgs()}")
@@ -71,7 +73,6 @@ object FirebaseTestLabProcessCreator {
                 .plus(processData.gCloudBucketName?.let { sequenceOf("--results-bucket=$it") } ?: sequenceOf())
                 .plus(processData.gCloudDirectory?.let { sequenceOf("--results-dir=$it") } ?: sequenceOf())
                 .plus(if (device.isUseOrchestrator) sequenceOf("--use-orchestrator") else sequenceOf())
-                .plus(setupEnvironmentVariables(device, processData.shardIndex))
                 .plus(if (device.testTargets.isNotEmpty()) sequenceOf("--test-targets=${device.testTargets.joinToString(",")}") else sequenceOf())
                 .plus(device.customParamsForGCloudTool)
                 .plus(device.testRunnerClass?.let { sequenceOf("--test-runner-class=$it") } ?: sequenceOf())
