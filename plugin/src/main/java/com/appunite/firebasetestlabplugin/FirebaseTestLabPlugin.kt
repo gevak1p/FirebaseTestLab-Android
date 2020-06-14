@@ -138,7 +138,7 @@ class FirebaseTestLabPlugin : Plugin<Project> {
                                     "}\n")
                         }
                     }
-                    commandLine = listOf("bash", "-c", "rm -r \"${cloudSdkDir.absolutePath}\";export CLOUDSDK_CORE_DISABLE_PROMPTS=1 && export CLOUDSDK_INSTALL_DIR=\"${installDir.absolutePath}\" && curl https://sdk.cloud.google.com | bash")
+                    commandLine = listOf("bash", "-c", "rm -r \"${cloudSdkDir.absolutePath}\";export CLOUDSDK_CORE_DISABLE_PROMPTS=1 && export CLOUDSDK_INSTALL_DIR=\"${installDir.absolutePath}\" && curl https://sdk.cloud.google.com | bash && \"${gcloud.absolutePath}\" components install beta")
                     doLast {
                         if (!gcloud.exists()) throw IllegalStateException("Installation failed")
                         if (!gsutil.exists()) throw IllegalStateException("Installation failed")
