@@ -62,7 +62,7 @@ object FirebaseTestLabProcessCreator {
                 "--format=json",
                 "--device-ids=${device.deviceIds.joinArgs()}",
                 "--app=${processData.apk}",
-                "--num-shards=${processData.numShards}",
+                "--num-uniform-shards=${processData.numShards}",
                 "--locales=${device.locales.joinArgs()}",
                 "--os-version-ids=${device.androidApiLevels.joinArgs()}",
                 "--orientations=${device.screenOrientations.map { orientation -> orientation.gcloudName }.joinArgs()}")
