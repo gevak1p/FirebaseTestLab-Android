@@ -402,17 +402,18 @@ class FirebaseTestLabPlugin : Plugin<Project> {
 
         if (downloader != null) {
             listOf(variantSuffix, "${variantSuffix}Instrumentation").map{suffix ->
-               project.task(taskPrefixDownload + suffix, closureOf<Task> {
+                var downloadTaskName = taskPrefixDownload + suffix
+                project.task(downloadTaskName, closureOf<Task> {
                     group = Constants.FIREBASE_TEST_LAB
                     description = "Run Android Tests in Firebase Test Lab and download artifacts from google storage"
                     dependsOn(taskSetup)
-                    dependsOn(taskPrefixExecute + suffix)
                     mustRunAfter(cleanTask)
 
                     doLast {
                         downloader.getResults()
                     }
                 })
+                project.tasks.getByName(taskPrefixExecute + suffix).finalizedBy(downloadTaskName)
             }
         }
     }
