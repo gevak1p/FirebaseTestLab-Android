@@ -35,7 +35,7 @@ internal class CloudTestResultDownloader(
     }
 
     private fun downloadTestResults() {
-        val excludeQuery = StringBuilder().append("-x \".*\\.txt$|.*\\.apk$")
+        val excludeQuery = StringBuilder().append(".*\\.txt$|.*\\.apk$")
         if (!resultsTypes.xml) {
             excludeQuery.append("|.*\\.xml$")
         }
@@ -48,8 +48,11 @@ internal class CloudTestResultDownloader(
         if (!resultsTypes.video) {
             excludeQuery.append("|.*\\.mp4$")
         }
-        excludeQuery.append("|.*\\.txt$\"").toString()
-        val processCreator = ProcessBuilder(""""${sdk.gsutil.absolutePath}" -m rsync $excludeQuery -r "gs://$gCloudBucketName/$gCloudDirectory" "$resultsPath"'.asCommand()""")
+        excludeQuery.append("|.*\\.txt$").toString()
+        val processCreator = ProcessBuilder(sdk.gsutil.absolutePath,
+                "-m", "rsync",
+                "-x", excludeQuery.toString(),
+                "-r", "gs://$gCloudBucketName/$gCloudDirectory", resultsPath.absolutePath)
         val process = processCreator.start()
 
         process.errorStream.bufferedReader().forEachLine { logger.lifecycle(it) }
@@ -59,7 +62,8 @@ internal class CloudTestResultDownloader(
     }
 
     fun clearResultsDir() {
-        val processCreator = ProcessBuilder(""""${sdk.gsutil.absolutePath}" -m rm "gs://$gCloudBucketName/$gCloudDirectory/**"""".asCommand())
+        val processCreator = ProcessBuilder(sdk.gsutil.absolutePath, "-m",
+                "rm", "gs://$gCloudBucketName/$gCloudDirectory/**")
         val process = processCreator.start()
 
         process.errorStream.bufferedReader().forEachLine { logger.lifecycle(it) }
