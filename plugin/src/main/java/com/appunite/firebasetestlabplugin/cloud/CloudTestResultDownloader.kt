@@ -49,7 +49,7 @@ internal class CloudTestResultDownloader(
             excludeQuery.append("|.*\\.mp4$")
         }
         excludeQuery.append("|.*\\.txt$\"").toString()
-        val processCreator = ProcessBuilder(""""${sdk.gsutil.absolutePath}" -m rsync $excludeQuery -r gs://$gCloudBucketName/$gCloudDirectory $resultsPath'.asCommand()""")
+        val processCreator = ProcessBuilder(""""${sdk.gsutil.absolutePath}" -m rsync $excludeQuery -r "gs://$gCloudBucketName/$gCloudDirectory" "$resultsPath"'.asCommand()""")
         val process = processCreator.start()
 
         process.errorStream.bufferedReader().forEachLine { logger.lifecycle(it) }
@@ -59,7 +59,7 @@ internal class CloudTestResultDownloader(
     }
 
     fun clearResultsDir() {
-        val processCreator = ProcessBuilder(""""${sdk.gsutil.absolutePath}" -m rm gs://$gCloudBucketName/$gCloudDirectory/**""".asCommand())
+        val processCreator = ProcessBuilder(""""${sdk.gsutil.absolutePath}" -m rm "gs://$gCloudBucketName/$gCloudDirectory/**"""".asCommand())
         val process = processCreator.start()
 
         process.errorStream.bufferedReader().forEachLine { logger.lifecycle(it) }
