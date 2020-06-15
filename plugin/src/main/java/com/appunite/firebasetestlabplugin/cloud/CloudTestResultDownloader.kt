@@ -59,7 +59,7 @@ internal class CloudTestResultDownloader(
     }
 
     fun clearResultsDir() {
-        val processCreator = ProcessBuilder("""${sdk.gsutil.absolutePath} -m rm -r gs://$gCloudBucketName/$gCloudDirectory""".asCommand())
+        val processCreator = ProcessBuilder("""${sdk.gsutil.absolutePath} -m rm gs://$gCloudBucketName/$gCloudDirectory/**""".asCommand())
         val process = processCreator.start()
 
         process.errorStream.bufferedReader().forEachLine { logger.lifecycle(it) }
