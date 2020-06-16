@@ -301,7 +301,7 @@ class FirebaseTestLabPlugin : Plugin<Project> {
                                 gCloudDirectory = cloudDirectoryName,
                                 device = test.device,
                                 apk = resolveUnderTestApk(extension, test.apk, blankApk),
-                        
+                                variantName = variantName,
                                 testType = TestType.Robo
                             ))
                             processResult(result, ignoreFailures)
@@ -330,6 +330,7 @@ class FirebaseTestLabPlugin : Plugin<Project> {
                     device = test.device,
                     apk = apkUnderTest,
                     testType = TestType.Instrumentation(testApk),
+                    variantName = variantName,
                     numShards = numShards
                 )
 
