@@ -73,7 +73,7 @@ object FirebaseTestLabProcessCreator {
                     is TestType.Instrumentation -> sequenceOf("--type=instrumentation", "--test=${processData.testType.testApk}")
                 })
                 .plus(processData.gCloudBucketName?.let { sequenceOf("--results-bucket=$it") } ?: sequenceOf())
-                .plus(processData.gCloudDirectory?.let { sequenceOf("--results-dir=$it"+ "_$variantName") } ?: sequenceOf())
+                .plus(processData.gCloudDirectory?.let { sequenceOf("--results-dir=$it") } ?: sequenceOf())
                 .plus(if (device.isUseOrchestrator) sequenceOf("--use-orchestrator") else sequenceOf())
                 .plus(if (device.testTargets.isNotEmpty()) sequenceOf("--test-targets=${device.testTargets.joinToString(",")}") else sequenceOf())
                 .plus(device.customParamsForGCloudTool)
