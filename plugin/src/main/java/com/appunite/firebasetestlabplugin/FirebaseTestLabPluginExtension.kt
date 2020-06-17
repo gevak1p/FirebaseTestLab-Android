@@ -20,7 +20,7 @@ open class FirebaseTestLabPluginExtension(private val project: Project) {
     var ignoreFailures: Boolean = false
 
     internal val devices = project.container(Device::class.java)
-    val resultsTypes: ResultTypes = ResultTypes(xml=true)
+    val resultsTypes: ResultTypes = ResultTypes()
 
     fun createDevice(name: String, action: Device.() -> Unit): Device = devices.create(name, action)
     fun devices(closure: Closure<Device>) {

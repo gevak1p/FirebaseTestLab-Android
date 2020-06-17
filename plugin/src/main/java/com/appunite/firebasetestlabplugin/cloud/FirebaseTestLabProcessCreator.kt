@@ -19,9 +19,7 @@ data class ProcessData(
     val device: Device,
     val apk: File,
     val testType: TestType,
-    val shardIndex: Int = -1,
-    val numShards: Int = 0,
-    val variantName: String
+    val numShards: Int = 0
 ) : Serializable
 
 object FirebaseTestLabProcessCreator {
@@ -56,15 +54,14 @@ object FirebaseTestLabProcessCreator {
     
     private fun createProcess(processData: ProcessData): ProcessBuilder {
         val device: Device = processData.device
-        val variantName: String = processData.variantName
         return ProcessBuilder(
             sequenceOf(
                 processData.sdk.gcloud.absolutePath,
-                "beta", "firebase", "test", "android", "run",
+                "beta", "firebase", "test", "android", "run", // We call cgloud beta since --num-uniform-shards is still in beta
                 "--format=json",
                 "--device-ids=${device.deviceIds.joinArgs()}",
                 "--app=${processData.apk}",
-                "--num-uniform-shards=${processData.numShards}",
+                "--num-uniform-shards=${processData.numShards}", // We feed number of shards to gcloud
                 "--locales=${device.locales.joinArgs()}",
                 "--os-version-ids=${device.androidApiLevels.joinArgs()}",
                 "--orientations=${device.screenOrientations.map { orientation -> orientation.gcloudName }.joinArgs()}")
@@ -82,14 +79,4 @@ object FirebaseTestLabProcessCreator {
                 .toList()
         )
     }
-    
-    private fun setupEnvironmentVariables(device: Device, shardIndex: Int): Sequence<String> =
-        if (device.environmentVariables.isNotEmpty() || device.numShards > 0)
-            sequenceOf(StringBuilder()
-                .append("--environment-variables=")
-                .append(if (device.environmentVariables.isNotEmpty()) device.environmentVariables.joinToString(",") else "")
-                .append(if (device.environmentVariables.isNotEmpty() && device.numShards > 0) "," else "")
-                .append(if (device.numShards > 0) "numShards=${device.numShards},shardIndex=$shardIndex" else "")
-                .toString())
-        else sequenceOf()
 }

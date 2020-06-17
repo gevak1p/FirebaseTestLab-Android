@@ -16,6 +16,9 @@ internal class CloudTestResultDownloader(
         private val gCloudBucketName: String,
         private val logger: Logger) {
 
+    /**
+     * Get all test results of types resultsTypes
+     */
     fun getResults() {
         if (!resultsTypes.junit && !resultsTypes.logcat && !resultsTypes.video && !resultsTypes.xml) {
             return
@@ -49,6 +52,7 @@ internal class CloudTestResultDownloader(
             excludeQuery.append("|.*\\.mp4$")
         }
         excludeQuery.append("|.*\\.txt$").toString()
+        // Download requested files under the results directory using multiple threads (-m)
         val processCreator = ProcessBuilder(sdk.gsutil.absolutePath,
                 "-m", "rsync",
                 "-x", excludeQuery.toString(),
@@ -62,6 +66,7 @@ internal class CloudTestResultDownloader(
     }
 
     fun clearResultsDir() {
+        // Delete all files under the results directory using multiple threads (-m)
         val processCreator = ProcessBuilder(sdk.gsutil.absolutePath, "-m",
                 "rm", "gs://$gCloudBucketName/$gCloudDirectory/**")
         val process = processCreator.start()

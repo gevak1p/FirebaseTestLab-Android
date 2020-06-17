@@ -138,6 +138,7 @@ class FirebaseTestLabPlugin : Plugin<Project> {
                                     "}\n")
                         }
                     }
+                    // We install gcloud sdk, and then install the beta components necessary to use --num-uniform-shards
                     commandLine = listOf("bash", "-c", "rm -r \"${cloudSdkDir.absolutePath}\";export CLOUDSDK_CORE_DISABLE_PROMPTS=1 && export CLOUDSDK_INSTALL_DIR=\"${installDir.absolutePath}\" && curl https://sdk.cloud.google.com | bash && \"${gcloud.absolutePath}\" components install beta")
                     doLast {
                         if (!gcloud.exists()) throw IllegalStateException("Installation failed")
@@ -218,6 +219,7 @@ class FirebaseTestLabPlugin : Plugin<Project> {
     
                     val extensionType: ExtensionType = when (androidExtension) {
                         is LibraryExtension -> ExtensionType.Library(testVariant)
+                        // Find the application variant matching this specific tests build type and flavor
                         is AppExtension -> ExtensionType.Application(testVariant, androidExtension.applicationVariants.toList().firstOrNull { it.buildType == testVariant.buildType && it.flavorName == testVariant.flavorName }!!)
                         else -> throw IllegalStateException("Only application and library modules are supported")
                     }
@@ -301,7 +303,6 @@ class FirebaseTestLabPlugin : Plugin<Project> {
                                 gCloudDirectory = cloudDirectoryName,
                                 device = test.device,
                                 apk = resolveUnderTestApk(extension, test.apk, blankApk),
-                                variantName = variantName,
                                 testType = TestType.Robo
                             ))
                             processResult(result, ignoreFailures)
@@ -309,8 +310,6 @@ class FirebaseTestLabPlugin : Plugin<Project> {
                     })
                 }
         }
-
-        val testResultFile = File(project.buildDir, "TestResults.txt")
 
         val instrumentationTasks: List<Task> = combineAll(appVersions, extension.testVariant.outputs)
         { deviceAndMap, testApk -> Test(deviceAndMap.device, deviceAndMap.apk, testApk) }
@@ -330,7 +329,6 @@ class FirebaseTestLabPlugin : Plugin<Project> {
                     device = test.device,
                     apk = apkUnderTest,
                     testType = TestType.Instrumentation(testApk),
-                    variantName = variantName,
                     numShards = numShards
                 )
 
