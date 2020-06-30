@@ -72,6 +72,7 @@ object FirebaseTestLabProcessCreator {
                 .plus(processData.gCloudBucketName?.let { sequenceOf("--results-bucket=$it") } ?: sequenceOf())
                 .plus(processData.gCloudDirectory?.let { sequenceOf("--results-dir=$it") } ?: sequenceOf())
                 .plus(if (device.isUseOrchestrator) sequenceOf("--use-orchestrator") else sequenceOf())
+                .plus(setupEnvironmentVariables(device))
                 .plus(if (device.testTargets.isNotEmpty()) sequenceOf("--test-targets=${device.testTargets.joinToString(",")}") else sequenceOf())
                 .plus(device.customParamsForGCloudTool)
                 .plus(device.testRunnerClass?.let { sequenceOf("--test-runner-class=$it") } ?: sequenceOf())
@@ -79,4 +80,12 @@ object FirebaseTestLabProcessCreator {
                 .toList()
         )
     }
+
+    private fun setupEnvironmentVariables(device: Device): Sequence<String> =
+            if (device.environmentVariables.isNotEmpty())
+                sequenceOf(StringBuilder()
+                        .append("--environment-variables=")
+                        .append(device.environmentVariables.joinToString(","))
+                        .toString())
+            else sequenceOf()
 }
